@@ -18,11 +18,6 @@ internal class CheaterDetectionKtTest {
 
         val cheaterId = findCheaterIn(InputCase(playerAnswers))
 
-        playerAnswers.find { it.id == 59 }!!.let { println(it.nbGoodAnswers) }
-        playerAnswers.maxByOrNull { it.nbGoodAnswers }!!.let {
-            println(it.id)
-            println(it.nbGoodAnswers)
-        }
         expectThat(cheaterId).isEqualTo(59)
     }
 }
