@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 
-internal class RevesrseSortEngineringKtTest {
+internal class ReverseSortEngineeringKtTest {
 
     @Test
     fun `Test case 1 must return 4 2 1 3`() {
@@ -58,15 +58,6 @@ internal class RevesrseSortEngineringKtTest {
         val solution = computeSolution(input)
 
         expectThat(solution).isEqualTo(listOf(2, 4, 3, 1))
-        // 2 3 4 1
-        // 1 4 3 2 -> 4
-        // 1 2 3 4 -> 3
-        // 1 2 3 4 -> 1
-
-        // 2 4 3 1
-        // 1 3 4 2 -> 4
-        // 1 2 4 3 -> 3
-        // 1 2 3 4 -> 2
     }
 
 }
