@@ -1,11 +1,18 @@
 package com.tom.qualification.mediansort
 
 fun main() {
-    val (nbOfCase, nbOfElementsToSort, nbAllowedQuestions) = readLine()!!.toList().map { it.toInt() }
+    val (nbOfCase, nbOfElementsToSort, nbAllowedQuestions) = readLine()!!.split(" ").map { it.toInt() }
     val testSetDefinition = TestSetDefinition(nbOfCase, nbOfElementsToSort, nbAllowedQuestions)
-    for (i in 0 until testSetDefinition.nbOfCases) {
-        println(sortNextList(testSetDefinition, JudgeSystemReal()))
-        readLine()
+    for (i in 1..testSetDefinition.nbOfCases) {
+        val sortedList = sortNextList(testSetDefinition, JudgeSystemReal())
+        if (sortedList.isEmpty()) {
+            return
+        }
+        println(sortedList.joinToString(" ") { it.toString() })
+        val result = readLine()!!.toInt()
+        if (result == -1) {
+            return
+        }
     }
 }
 
@@ -15,32 +22,34 @@ fun sortNextList(testSetDefinition: TestSetDefinition, judgeSystem: JudgeSystem)
     return sortList(originalList, null, null, judgeSystem)
 }
 
-private fun sortList(list: List<Int>, before: Int?, after: Int?, judgeSystem: JudgeSystem) : List<Int> {
-    if(list.size <= 1) {
+private fun sortList(list: List<Int>, before: Int?, after: Int?, judgeSystem: JudgeSystem): List<Int> {
+    if (list.size <= 1) {
         return list
     }
 
     val originalList = list.toMutableList()
 
-    val firstNumber : Int
-    val sescondNumber : Int
-    val thirdNumber : Int
+    val firstNumber: Int
+    val secondNumber: Int
+    val thirdNumber: Int
 
-    if(before != null) {
-        firstNumber = before
-        sescondNumber = originalList.removeFirst()
-        thirdNumber = originalList.removeFirst()
-    } else if (after != null) {
-        firstNumber = originalList.removeFirst()
-        sescondNumber = originalList.removeFirst()
-        thirdNumber = after
-    } else  {
-        firstNumber = originalList.removeFirst()
-        sescondNumber = originalList.removeFirst()
-        thirdNumber = originalList.removeFirst()
+    when {
+        before != null -> {
+            firstNumber = before
+            secondNumber = originalList.removeFirst()
+            thirdNumber = originalList.removeFirst()
+        }
+        after != null -> {
+            firstNumber = originalList.removeFirst()
+            secondNumber = originalList.removeFirst()
+            thirdNumber = after
+        }
+        else -> {
+            firstNumber = originalList.removeFirst()
+            secondNumber = originalList.removeFirst()
+            thirdNumber = originalList.removeFirst()
+        }
     }
-
-    val medianNumber = judgeSystem.askForMedian(firstNumber, sescondNumber, thirdNumber)
 
     val smallerNumbers = mutableListOf<Int>()
     val inBeetweenNumbers = mutableListOf<Int>()
@@ -48,33 +57,33 @@ private fun sortList(list: List<Int>, before: Int?, after: Int?, judgeSystem: Ju
 
     val smallNumber: Int
     val bigNumber: Int
-    when (medianNumber) {
+    when (judgeSystem.askForMedian(firstNumber, secondNumber, thirdNumber)) {
         firstNumber -> {
+            smallerNumbers.add(secondNumber)
             smallNumber = firstNumber
-            bigNumber = sescondNumber
-            biggerNumbers.add(thirdNumber)
+            bigNumber = thirdNumber
         }
-        sescondNumber -> {
+        secondNumber -> {
             smallNumber = firstNumber
-            bigNumber = sescondNumber
-            biggerNumbers.add(thirdNumber)
+            inBeetweenNumbers.add(secondNumber)
+            bigNumber = thirdNumber
         }
         thirdNumber -> {
             smallNumber = firstNumber
             bigNumber = thirdNumber
-            biggerNumbers.add(sescondNumber)
+            biggerNumbers.add(secondNumber)
         }
+        -1 -> return emptyList()
         else -> error("")
     }
 
     while (originalList.isNotEmpty()) {
         val nextNumberToSort = originalList.removeFirst()
-        val medianNumber = judgeSystem.askForMedian(smallNumber, bigNumber, thirdNumber)
-        val listToAdd = when(medianNumber) {
+        val listToAdd = when (judgeSystem.askForMedian(smallNumber, bigNumber, nextNumberToSort)) {
             smallNumber -> smallerNumbers
             bigNumber -> biggerNumbers
             nextNumberToSort -> inBeetweenNumbers
-            else -> error("Should never happen")
+            else -> return emptyList()
         }
         listToAdd.add(nextNumberToSort)
     }
@@ -82,12 +91,10 @@ private fun sortList(list: List<Int>, before: Int?, after: Int?, judgeSystem: Ju
     val smallerNumbersSorted = sortList(smallerNumbers, null, smallNumber, judgeSystem)
     val inBeetweenNumbersSorted = sortList(inBeetweenNumbers, smallNumber, bigNumber, judgeSystem)
     val biggerNumbersSorted = sortList(biggerNumbers, bigNumber, null, judgeSystem)
-    if(before != null) {
-        return smallerNumbersSorted + inBeetweenNumbersSorted + bigNumber + biggerNumbersSorted
-    } else if(after != null) {
-        return smallerNumbersSorted + smallNumber + inBeetweenNumbersSorted + biggerNumbersSorted
-    } else {
-        return smallerNumbersSorted + smallNumber + inBeetweenNumbersSorted + bigNumber + biggerNumbersSorted
+    return when {
+        before != null -> smallerNumbersSorted + inBeetweenNumbersSorted + bigNumber + biggerNumbersSorted
+        after != null -> smallerNumbersSorted + smallNumber + inBeetweenNumbersSorted + biggerNumbersSorted
+        else -> smallerNumbersSorted + smallNumber + inBeetweenNumbersSorted + bigNumber + biggerNumbersSorted
     }
 }
 
@@ -102,6 +109,4 @@ class JudgeSystemReal : JudgeSystem {
     }
 }
 
-data class TestSetDefinition(val nbOfCases: Int, val nbOfElementsToSort: Int, val nbAllowedQuestions: Int) {
-    val totalAllowedQuestions = nbOfCases * nbAllowedQuestions
-}
+data class TestSetDefinition(val nbOfCases: Int, val nbOfElementsToSort: Int, val nbAllowedQuestions: Int)
