@@ -71,7 +71,7 @@ internal class MedianSortKtTest {
 
     @Test
     fun testCase6() {
-        val nbOfCase = 100
+        val nbOfCase = 100000
         val nbNumbersToSort = 50
         val nbAllowedQuestionPerNumber = 170
         val testSetDefinition = TestSetDefinition(nbOfCase, nbNumbersToSort, nbAllowedQuestionPerNumber)
@@ -86,6 +86,7 @@ internal class MedianSortKtTest {
         }
 
         expectThat(totalQuestionAsked).isLessThan(nbOfCase * nbAllowedQuestionPerNumber)
+        println(totalQuestionAsked.toDouble() / nbOfCase)
     }
 
 }

@@ -29,27 +29,23 @@ private fun sortList(list: List<Int>, before: Int?, after: Int?, judgeSystem: Ju
 
     val originalList = list.toMutableList()
 
-    val firstNumber: Int
-    val secondNumber: Int
-    val thirdNumber: Int
-
-    when {
-        before != null -> {
-            firstNumber = before
-            secondNumber = originalList.removeFirst()
-            thirdNumber = originalList.removeFirst()
-        }
-        after != null -> {
-            firstNumber = originalList.removeFirst()
-            secondNumber = originalList.removeFirst()
-            thirdNumber = after
-        }
-        else -> {
-            firstNumber = originalList.removeFirst()
-            secondNumber = originalList.removeFirst()
-            thirdNumber = originalList.removeFirst()
+    val firstNumber: Int = originalList.removeFirst()
+    val secondNumber: Int = originalList.removeFirst()
+    if (list.size == 2) {
+        if (before != null) {
+            return when(judgeSystem.askForMedian(firstNumber, secondNumber, before)) {
+                firstNumber -> listOf(firstNumber, secondNumber)
+                else -> listOf(secondNumber, firstNumber)
+            }
+        } else if (after != null) {
+            return when(judgeSystem.askForMedian(firstNumber, secondNumber, after)) {
+                firstNumber -> listOf(secondNumber, firstNumber)
+                else -> listOf(firstNumber, secondNumber)
+            }
         }
     }
+
+    val thirdNumber: Int = originalList.removeFirst()
 
     val smallerNumbers = mutableListOf<Int>()
     val inBeetweenNumbers = mutableListOf<Int>()
@@ -91,10 +87,24 @@ private fun sortList(list: List<Int>, before: Int?, after: Int?, judgeSystem: Ju
     val smallerNumbersSorted = sortList(smallerNumbers, null, smallNumber, judgeSystem)
     val inBeetweenNumbersSorted = sortList(inBeetweenNumbers, smallNumber, bigNumber, judgeSystem)
     val biggerNumbersSorted = sortList(biggerNumbers, bigNumber, null, judgeSystem)
+    val sortedList = smallerNumbersSorted + smallNumber + inBeetweenNumbersSorted + bigNumber + biggerNumbersSorted
+
+    val sortedListFirst = sortedList.first()
+    val sortedListLast = sortedList.last()
     return when {
-        before != null -> smallerNumbersSorted + inBeetweenNumbersSorted + bigNumber + biggerNumbersSorted
-        after != null -> smallerNumbersSorted + smallNumber + inBeetweenNumbersSorted + biggerNumbersSorted
-        else -> smallerNumbersSorted + smallNumber + inBeetweenNumbersSorted + bigNumber + biggerNumbersSorted
+        before != null -> {
+            when(judgeSystem.askForMedian(sortedListFirst, sortedListLast, before)) {
+                sortedListFirst -> sortedList
+                else -> sortedList.reversed()
+            }
+        }
+        after != null -> {
+            when(judgeSystem.askForMedian(sortedListFirst, sortedListLast, after)) {
+                sortedListFirst -> sortedList.reversed()
+                else -> sortedList
+            }
+        }
+        else -> sortedList
     }
 }
 
