@@ -32,8 +32,8 @@ internal class MedianSortKtTest {
     }
 
    @Test
-        fun `testCase4`() {
-        val nbOfCase = 100
+        fun `Test like test set 1`() {
+        val nbOfCase = 1000
         val nbNumbersToSort = 10
         val nbAllowedQuestionPerNumber = 300
         val testSetDefinition = TestSetDefinition(nbOfCase, nbNumbersToSort, nbAllowedQuestionPerNumber)
@@ -51,8 +51,8 @@ internal class MedianSortKtTest {
     }
 
     @Test
-    fun testCase5() {
-        val nbOfCase = 100
+    fun `Test like test set 2`() {
+        val nbOfCase = 1000
         val nbNumbersToSort = 50
         val nbAllowedQuestionPerNumber = 300
         val testSetDefinition = TestSetDefinition(nbOfCase, nbNumbersToSort, nbAllowedQuestionPerNumber)
@@ -70,8 +70,8 @@ internal class MedianSortKtTest {
     }
 
     @Test
-    fun testCase6() {
-        val nbOfCase = 100000
+    fun `Test like test set 3`() {
+        val nbOfCase = 1000
         val nbNumbersToSort = 50
         val nbAllowedQuestionPerNumber = 170
         val testSetDefinition = TestSetDefinition(nbOfCase, nbNumbersToSort, nbAllowedQuestionPerNumber)
@@ -79,6 +79,27 @@ internal class MedianSortKtTest {
         var totalQuestionAsked = 0
         for(i in 0 until nbOfCase) {
             val expectedList = List(nbNumbersToSort) { it + 1}.shuffled()
+            val judgeSystemFake = JudgeSystemFake(expectedList)
+            val sortedList = sortNextList(testSetDefinition , judgeSystemFake)
+            expectThat(sortedList).isEqualOrReverse(expectedList)
+            totalQuestionAsked += judgeSystemFake.nbTimesAsked
+        }
+
+        expectThat(totalQuestionAsked).isLessThan(nbOfCase * nbAllowedQuestionPerNumber)
+        println(totalQuestionAsked.toDouble() / nbOfCase)
+    }
+
+
+    @Test
+    fun `Test like test set 3 with list in order`() {
+        val nbOfCase = 1000
+        val nbNumbersToSort = 50
+        val nbAllowedQuestionPerNumber = 170
+        val testSetDefinition = TestSetDefinition(nbOfCase, nbNumbersToSort, nbAllowedQuestionPerNumber)
+
+        var totalQuestionAsked = 0
+        for(i in 0 until nbOfCase) {
+            val expectedList = List(nbNumbersToSort) { it + 1}
             val judgeSystemFake = JudgeSystemFake(expectedList)
             val sortedList = sortNextList(testSetDefinition , judgeSystemFake)
             expectThat(sortedList).isEqualOrReverse(expectedList)

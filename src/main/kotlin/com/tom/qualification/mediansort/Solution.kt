@@ -17,7 +17,7 @@ fun main() {
 }
 
 fun sortNextList(testSetDefinition: TestSetDefinition, judgeSystem: JudgeSystem): List<Int> {
-    val originalList = MutableList(testSetDefinition.nbOfElementsToSort) { it + 1 }
+    val originalList = List(testSetDefinition.nbOfElementsToSort) { it + 1 }.shuffled()
 
     return sortList(originalList, null, null, judgeSystem)
 }
