@@ -33,15 +33,17 @@ private fun sortList(list: List<Int>, before: Int?, after: Int?, judgeSystem: Ju
     val inBeetweenNumbers = mutableListOf<Int>()
     val biggerNumbers = mutableListOf<Int>()
 
-    while (nextNumbersToSort.isNotEmpty()) {
-        val nextNumberToSort = nextNumbersToSort.removeFirst()
-        val listToAdd = when (judgeSystem.askForMedian(smallNumber, bigNumber, nextNumberToSort)) {
-            smallNumber -> smallerNumbers
-            bigNumber -> biggerNumbers
-            nextNumberToSort -> inBeetweenNumbers
-            else -> error("This should never happens")
+    val sortNextNumber: (Int) -> Boolean = { numberToSort : Int ->
+        val listToAdd = when (judgeSystem.askForMedian(smallNumber, bigNumber, numberToSort)) {
+            Median.FIRST -> smallerNumbers
+            Median.SECOND -> biggerNumbers
+            Median.THIRD -> inBeetweenNumbers
         }
-        listToAdd.add(nextNumberToSort)
+        listToAdd.add(numberToSort)
+    }
+
+    while (nextNumbersToSort.isNotEmpty()) {
+        sortNextNumber(nextNumbersToSort.removeFirst())
     }
 
     val smallerNumbersSorted = sortList(smallerNumbers, null, smallNumber, judgeSystem)
@@ -52,13 +54,13 @@ private fun sortList(list: List<Int>, before: Int?, after: Int?, judgeSystem: Ju
     return when {
         before != null -> {
             when (judgeSystem.askForMedian(sortedList.first(), sortedList.last(), before)) {
-                sortedList.first() -> sortedList
+                Median.FIRST -> sortedList
                 else -> sortedList.reversed()
             }
         }
         after != null -> {
             when (judgeSystem.askForMedian(sortedList.first(), sortedList.last(), after)) {
-                sortedList.first() -> sortedList.reversed()
+                Median.FIRST -> sortedList.reversed()
                 else -> sortedList
             }
         }
@@ -67,13 +69,21 @@ private fun sortList(list: List<Int>, before: Int?, after: Int?, judgeSystem: Ju
 }
 
 interface JudgeSystem {
-    fun askForMedian(first: Int, second: Int, third: Int): Int
+    fun askForMedian(first: Int, second: Int, third: Int): Median
+}
+
+enum class Median {
+    FIRST, SECOND, THIRD
 }
 
 class JudgeSystemReal : JudgeSystem {
-    override fun askForMedian(first: Int, second: Int, third: Int): Int {
+    override fun askForMedian(first: Int, second: Int, third: Int): Median {
         println("$first $second $third")
-        return readLine()!!.toInt()
+        return when(readLine()!!.toInt()) {
+            first -> Median.FIRST
+            second -> Median.SECOND
+            else -> Median.THIRD
+        }
     }
 }
 

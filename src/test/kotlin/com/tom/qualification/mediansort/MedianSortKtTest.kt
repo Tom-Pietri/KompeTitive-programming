@@ -118,18 +118,18 @@ class JudgeSystemFake(private val list: List<Int>) : JudgeSystem {
 
     var nbTimesAsked = 0
 
-    override fun askForMedian(first: Int, second: Int, third: Int): Int {
+    override fun askForMedian(first: Int, second: Int, third: Int): Median {
         nbTimesAsked++
         val firstIndex = list.indexOf(first)
         val secondIndex = list.indexOf(second)
         val thirdIndex = list.indexOf(third)
 
         return if(secondIndex in (firstIndex + 1) until thirdIndex || secondIndex in (thirdIndex + 1) until firstIndex) {
-            second
+            Median.SECOND
         } else if(thirdIndex in (firstIndex + 1) until secondIndex || thirdIndex in (secondIndex + 1) until firstIndex) {
-            third
+            Median.THIRD
         } else {
-            first
+            Median.FIRST
         }
     }
 
