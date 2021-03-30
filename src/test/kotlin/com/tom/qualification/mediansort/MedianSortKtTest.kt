@@ -86,7 +86,6 @@ internal class MedianSortKtTest {
         }
 
         expectThat(totalQuestionAsked).isLessThan(nbOfCase * nbAllowedQuestionPerNumber)
-        println(totalQuestionAsked.toDouble() / nbOfCase)
     }
 
 
@@ -107,7 +106,6 @@ internal class MedianSortKtTest {
         }
 
         expectThat(totalQuestionAsked).isLessThan(nbOfCase * nbAllowedQuestionPerNumber)
-        println(totalQuestionAsked.toDouble() / nbOfCase)
     }
 
 }

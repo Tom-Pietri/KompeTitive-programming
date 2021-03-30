@@ -5,9 +5,6 @@ fun main() {
     val testSetDefinition = TestSetDefinition(nbOfCase, nbOfElementsToSort, nbAllowedQuestions)
     for (i in 1..testSetDefinition.nbOfCases) {
         val sortedList = sortNextList(testSetDefinition, JudgeSystemReal())
-        if (sortedList.isEmpty()) {
-            return
-        }
         println(sortedList.joinToString(" ") { it.toString() })
         val result = readLine()!!.toInt()
         if (result == -1) {
@@ -27,59 +24,22 @@ private fun sortList(list: List<Int>, before: Int?, after: Int?, judgeSystem: Ju
         return list
     }
 
-    val originalList = list.toMutableList()
+    val nextNumbersToSort = list.toMutableList()
 
-    val firstNumber: Int = originalList.removeFirst()
-    val secondNumber: Int = originalList.removeFirst()
-    if (list.size == 2) {
-        if (before != null) {
-            return when(judgeSystem.askForMedian(firstNumber, secondNumber, before)) {
-                firstNumber -> listOf(firstNumber, secondNumber)
-                else -> listOf(secondNumber, firstNumber)
-            }
-        } else if (after != null) {
-            return when(judgeSystem.askForMedian(firstNumber, secondNumber, after)) {
-                firstNumber -> listOf(secondNumber, firstNumber)
-                else -> listOf(firstNumber, secondNumber)
-            }
-        }
-    }
-
-    val thirdNumber: Int = originalList.removeFirst()
+    val smallNumber: Int = nextNumbersToSort.removeFirst()
+    val bigNumber: Int = nextNumbersToSort.removeFirst()
 
     val smallerNumbers = mutableListOf<Int>()
     val inBeetweenNumbers = mutableListOf<Int>()
     val biggerNumbers = mutableListOf<Int>()
 
-    val smallNumber: Int
-    val bigNumber: Int
-    when (judgeSystem.askForMedian(firstNumber, secondNumber, thirdNumber)) {
-        firstNumber -> {
-            smallerNumbers.add(secondNumber)
-            smallNumber = firstNumber
-            bigNumber = thirdNumber
-        }
-        secondNumber -> {
-            smallNumber = firstNumber
-            inBeetweenNumbers.add(secondNumber)
-            bigNumber = thirdNumber
-        }
-        thirdNumber -> {
-            smallNumber = firstNumber
-            bigNumber = thirdNumber
-            biggerNumbers.add(secondNumber)
-        }
-        -1 -> return emptyList()
-        else -> error("")
-    }
-
-    while (originalList.isNotEmpty()) {
-        val nextNumberToSort = originalList.removeFirst()
+    while (nextNumbersToSort.isNotEmpty()) {
+        val nextNumberToSort = nextNumbersToSort.removeFirst()
         val listToAdd = when (judgeSystem.askForMedian(smallNumber, bigNumber, nextNumberToSort)) {
             smallNumber -> smallerNumbers
             bigNumber -> biggerNumbers
             nextNumberToSort -> inBeetweenNumbers
-            else -> return emptyList()
+            else -> error("This should never happens")
         }
         listToAdd.add(nextNumberToSort)
     }
@@ -89,18 +49,16 @@ private fun sortList(list: List<Int>, before: Int?, after: Int?, judgeSystem: Ju
     val biggerNumbersSorted = sortList(biggerNumbers, bigNumber, null, judgeSystem)
     val sortedList = smallerNumbersSorted + smallNumber + inBeetweenNumbersSorted + bigNumber + biggerNumbersSorted
 
-    val sortedListFirst = sortedList.first()
-    val sortedListLast = sortedList.last()
     return when {
         before != null -> {
-            when(judgeSystem.askForMedian(sortedListFirst, sortedListLast, before)) {
-                sortedListFirst -> sortedList
+            when (judgeSystem.askForMedian(sortedList.first(), sortedList.last(), before)) {
+                sortedList.first() -> sortedList
                 else -> sortedList.reversed()
             }
         }
         after != null -> {
-            when(judgeSystem.askForMedian(sortedListFirst, sortedListLast, after)) {
-                sortedListFirst -> sortedList.reversed()
+            when (judgeSystem.askForMedian(sortedList.first(), sortedList.last(), after)) {
+                sortedList.first() -> sortedList.reversed()
                 else -> sortedList
             }
         }
