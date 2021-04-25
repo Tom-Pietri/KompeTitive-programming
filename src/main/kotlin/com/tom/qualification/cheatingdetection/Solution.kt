@@ -18,61 +18,17 @@ fun main() {
 }
 
 fun findCheaterIn(input: InputCase): Int {
-    val oneAsShort = 1.toShort()
     val suspiciousScore = input.player.filter { it.nbGoodAnswers > 6000 }.map { player ->
-        val chancesRangeToCorrectAnswers = ChancesToAnserCorrectlyRange.values().map { it to 0 }.toMap().toMutableMap()
-        val chancesRangeToWrongAnswers = ChancesToAnserCorrectlyRange.values().map { it to 0 }.toMap().toMutableMap()
 
-        player.answer.forEachIndexed { i, answer ->
-            val chanceToAnswerCorrectly = input.questions[i].chanceToAnswerCorrectly(player.calculatedSkill) * 100
-
-            val forChances = ChancesToAnserCorrectlyRange.forChances(chanceToAnswerCorrectly)
-            if (answer == oneAsShort) {
-                chancesRangeToCorrectAnswers[forChances] = chancesRangeToCorrectAnswers[forChances]!! + 1
-            }
-         }
-
-        player.id to chancesRangeToCorrectAnswers.map { it.key.suspiciousWeight * it.value }.sum()
+        val chanceToAnswer = input.questions.map { it.chanceToAnswerCorrectly(player.calculatedSkill) }
+        player.id to chanceToAnswer
+            .map { it - (1 - it) }
+            .sum() / player.nbGoodAnswers
     }
 
-    suspiciousScore.find { it.first == 59 }
-    val sorted = suspiciousScore.sortedBy { it.second }
+    suspiciousScore.sortedBy { it.second }
     return suspiciousScore.maxByOrNull { it.second }!!.first
-
-//    return input.player.maxByOrNull { it.nbGoodAnswers }!!.id
 }
-
-data class Answers(val correct: Int = 0, val wrong: Int = 0)
-
-private enum class ChancesToAnserCorrectlyRange(val suspiciousWeight: Int) {
-    LESS_THAN_ONE(25),
-    ONE_TO_TWO(20),
-    TWO_TO_FIVE(15),
-    FIVE_TO_TEN(10),
-    TEN_TO_TWENTY(5),
-    TWENTY_TO_THIRTY(3),
-    THIRTY_TO_FOURTY(2),
-    FORTY_TO_FIFTY(2),
-    FIFTY_TO_HUNDRED(2);
-
-    companion object {
-        fun forChances(chanceToAnswerCorrectly: Double): ChancesToAnserCorrectlyRange {
-            return when {
-                chanceToAnswerCorrectly < 1 -> LESS_THAN_ONE
-                chanceToAnswerCorrectly < 2 -> ONE_TO_TWO
-                chanceToAnswerCorrectly < 5 -> TWO_TO_FIVE
-                chanceToAnswerCorrectly < 10 -> FIVE_TO_TEN
-                chanceToAnswerCorrectly < 20 -> TEN_TO_TWENTY
-                chanceToAnswerCorrectly < 30 -> TWENTY_TO_THIRTY
-                chanceToAnswerCorrectly < 40 -> THIRTY_TO_FOURTY
-                chanceToAnswerCorrectly < 50 -> FORTY_TO_FIFTY
-                else -> FIFTY_TO_HUNDRED
-            }
-        }
-    }
-
-}
-
 
 data class Question(val number: Int, val calculatedDifficulty: Double) {
     fun chanceToAnswerCorrectly(skill: Double): Double {
