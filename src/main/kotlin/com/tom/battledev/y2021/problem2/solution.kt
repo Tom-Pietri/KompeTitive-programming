@@ -1,4 +1,4 @@
-package com.tom.battledev.y2021.problem1
+package com.tom.battledev.y2021.problem2
 
 fun main() {
     val nbButons = readLine()!!.toInt()

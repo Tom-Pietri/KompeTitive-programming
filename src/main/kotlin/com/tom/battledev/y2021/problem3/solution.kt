@@ -1,3 +1,5 @@
+package com.tom.battledev.y2021.problem3
+
 fun main() {
     val lines = mutableListOf<String>()
     for (i in 1..20) {

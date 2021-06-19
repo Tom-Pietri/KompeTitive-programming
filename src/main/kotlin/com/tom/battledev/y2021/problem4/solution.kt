@@ -1,3 +1,5 @@
+package com.tom.battledev.y2021.problem4
+
 fun main() {
     val orbitSize = readLine()!!.toInt()
     val orbit = readLine()!!
