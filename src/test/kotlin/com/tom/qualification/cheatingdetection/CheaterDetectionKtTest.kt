@@ -11,6 +11,7 @@ internal class CheaterDetectionKtTest {
     @Test
     fun `Sample test case should find cheater 59`() {
         val sampleFile = File("./src/main/resources/sampleCheater.txt").bufferedReader()
+
         sampleFile.readLine()
         sampleFile.readLine()
         val playerAnswers = (1..100).map {
